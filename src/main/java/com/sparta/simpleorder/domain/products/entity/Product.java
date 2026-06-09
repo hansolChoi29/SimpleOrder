@@ -25,4 +25,21 @@ public class Product {
 
     @Column(name = "stock_quantity", nullable = false)
     private int stockQuantity;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ProductStatus status;
+
+    public static Product create(
+            String name,
+            BigDecimal price,
+            int stockQuantity
+    ) {
+        Product product = new Product();
+        product.name = name;
+        product.price = price;
+        product.stockQuantity = stockQuantity;
+        product.status = ProductStatus.POSSIBLE;
+        return product;
+    }
 }
