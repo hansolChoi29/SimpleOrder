@@ -2,6 +2,7 @@ package com.sparta.simpleorder.domain.products.controller;
 
 import com.sparta.simpleorder.domain.products.dto.request.CreateRequestDto;
 import com.sparta.simpleorder.domain.products.dto.response.CreateResponseDto;
+import com.sparta.simpleorder.domain.products.dto.response.GetListResponse;
 import com.sparta.simpleorder.domain.products.dto.response.GetOneResponse;
 import com.sparta.simpleorder.domain.products.entity.Product;
 import com.sparta.simpleorder.domain.products.service.ProductService;
@@ -18,6 +19,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import tools.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -98,4 +100,30 @@ class ProductControllerTest {
         verify(service).getOne(productId);
         verifyNoMoreInteractions(service);
     }
+
+    @Test
+    @DisplayName("상품전제조회_성공")
+    void getList()throws Exception{
+        Long productId =  1L;
+        GetListResponse items =new GetListResponse(
+                productId,
+                "name",
+                new BigDecimal(1000),
+                1
+        );
+
+        List<GetListResponse> response = List.of(items);
+
+        given(service.getList()).willReturn(response);
+        mockMvc.perform(
+                get("/products")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(productId))
+                .andExpect(jsonPath("$[0].name").value("name"))
+                .andExpect(jsonPath("$[0].price").value(new BigDecimal(1000)))
+                .andExpect(jsonPath("$[0].stockQuantity").value(1));
+        verify(service).getList();
+    }
+
 }
