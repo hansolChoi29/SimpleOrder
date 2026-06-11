@@ -2,6 +2,7 @@ package com.sparta.simpleorder.domain.orders.service;
 
 
 import com.sparta.simpleorder.domain.orders.dto.request.CreateRequestDto;
+import com.sparta.simpleorder.domain.orders.dto.response.GetOneResponseDto;
 import com.sparta.simpleorder.domain.orders.entity.Order;
 import com.sparta.simpleorder.domain.orders.repository.OrderRepository;
 import com.sparta.simpleorder.domain.orders.dto.response.CreateResponseDto;
@@ -33,5 +34,20 @@ public class OrderService {
         );
         Order saveOrder = orderRepository.save(order);
         return new CreateResponseDto(saveOrder.getId());
+    }
+
+    @Transactional(readOnly = true)
+    public GetOneResponseDto getOne(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문내역입니다."));
+        return new GetOneResponseDto(
+                order.getId(),
+                order.getProduct().getId(),
+                order.getProduct().getName(),
+                order.getQuantity(),
+                order.getTotalPrice(),
+                order.getStatus(),
+                order.getCreatedAt()
+        );
     }
 }

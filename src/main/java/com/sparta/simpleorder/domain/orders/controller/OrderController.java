@@ -3,6 +3,7 @@ package com.sparta.simpleorder.domain.orders.controller;
 
 import com.sparta.simpleorder.domain.orders.dto.request.CreateRequestDto;
 import com.sparta.simpleorder.domain.orders.dto.response.CreateResponseDto;
+import com.sparta.simpleorder.domain.orders.dto.response.GetOneResponseDto;
 import com.sparta.simpleorder.domain.orders.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,5 +24,13 @@ public class OrderController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<GetOneResponseDto> getOne(
+            @PathVariable("id") Long id
+    ){
+        GetOneResponseDto response = orderService.getOne(id);
+        return ResponseEntity.ok(response);
     }
 }

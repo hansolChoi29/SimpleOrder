@@ -2,7 +2,9 @@ package com.sparta.simpleorder.domain.orders.service;
 
 import com.sparta.simpleorder.domain.orders.dto.request.CreateRequestDto;
 import com.sparta.simpleorder.domain.orders.dto.response.CreateResponseDto;
+import com.sparta.simpleorder.domain.orders.dto.response.GetOneResponseDto;
 import com.sparta.simpleorder.domain.orders.entity.Order;
+import com.sparta.simpleorder.domain.orders.entity.OrderStatus;
 import com.sparta.simpleorder.domain.orders.repository.OrderRepository;
 import com.sparta.simpleorder.domain.products.entity.Product;
 import com.sparta.simpleorder.domain.products.repository.ProductRepository;
@@ -60,6 +62,33 @@ class OrderServiceTest {
         verify(orderRepository).save(any(Order.class));
 
         assertThat(response.id()).isEqualTo(order.getId());
+    }
+
+    @Test
+    @DisplayName("주문단건조회_성공")
+    void getOne() {
+        Long orderId = 1L;
+        Product product = Product.create(
+                "name",
+                new BigDecimal(1000),
+                1
+        );
+        Order order = Order.create(
+                product,
+                1
+        );
+        ReflectionTestUtils.setField(order, "id", orderId);
+        given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
+
+        GetOneResponseDto response = orderService.getOne(orderId);
+        verify(orderRepository).findById(orderId);
+
+        assertThat(response.id()).isEqualTo(order.getId());
+        assertThat(response.productId()).isEqualTo(product.getId());
+        assertThat(response.productName()).isEqualTo(product.getName());
+        assertThat(response.quantity()).isEqualTo(order.getQuantity());
+        assertThat(response.totalPrice()).isEqualTo(order.getTotalPrice());
+        assertThat(response.status()).isEqualTo(OrderStatus.ORDERED);
     }
 
 }
