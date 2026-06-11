@@ -66,7 +66,7 @@ public class ProductService {
     ) {
         Product product = notFoundProduct(id);
         validateDuplicateProductName(request.name());
-
+        // TODO : 자기 자신은 허용되게
         product.update(
                 request.name(),
                 request.price(),
