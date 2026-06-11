@@ -2,6 +2,8 @@ package com.sparta.simpleorder.domain.products.controller;
 
 import com.sparta.simpleorder.domain.products.dto.request.CreateRequestDto;
 import com.sparta.simpleorder.domain.products.dto.response.CreateResponseDto;
+import com.sparta.simpleorder.domain.products.dto.response.GetOneResponse;
+import com.sparta.simpleorder.domain.products.entity.Product;
 import com.sparta.simpleorder.domain.products.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,12 +18,15 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import tools.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -67,5 +72,30 @@ class ProductControllerTest {
         assertThat(captorRequest.name()).isEqualTo("name");
         assertThat(captorRequest.price()).isEqualTo(new BigDecimal(10000));
         assertThat(captorRequest.stockQuantity()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("상품단건조회_성공")
+    void getOne() throws Exception {
+        Long productId = 1L;
+
+        GetOneResponse response = new GetOneResponse(
+                productId,
+                "name",
+                new BigDecimal(1000),
+                1
+        );
+        given(service.getOne(productId)).willReturn(response);
+
+        mockMvc.perform(
+                        get("/products/{id}", productId)
+                                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(productId))
+                .andExpect(jsonPath("$.name").value("name"))
+                .andExpect(jsonPath("$.price").value(new BigDecimal(1000)))
+                .andExpect(jsonPath("$.stockQuantity").value(1));
+        verify(service).getOne(productId);
+        verifyNoMoreInteractions(service);
     }
 }
