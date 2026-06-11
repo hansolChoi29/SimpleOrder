@@ -7,6 +7,7 @@ import com.sparta.simpleorder.domain.products.dto.response.GetListResponse;
 import com.sparta.simpleorder.domain.products.dto.response.GetOneResponse;
 import com.sparta.simpleorder.domain.products.dto.response.UpdateResponse;
 import com.sparta.simpleorder.domain.products.entity.Product;
+import com.sparta.simpleorder.domain.products.entity.ProductStatus;
 import com.sparta.simpleorder.domain.products.repository.ProductRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -100,15 +101,16 @@ class ProductServiceTest {
     void update() {
         Long productId = 1L;
         Product product = Product.create(
-          "name",
-          new BigDecimal(1000),
+                "name",
+                new BigDecimal(1000),
                 1
         );
         ReflectionTestUtils.setField(product, "id", productId);
         UpdateRequest request = new UpdateRequest(
                 "rename",
                 new BigDecimal(1000),
-                1
+                1,
+                ProductStatus.IMPOSSIBLE
         );
 
         given(productRepository.findById(anyLong())).willReturn(Optional.of(product));
@@ -123,7 +125,7 @@ class ProductServiceTest {
 
     @Test
     @DisplayName("상품삭제_성공")
-    void isDelete(){
+    void isDelete() {
         Long productId = 1L;
 
         Product product = Product.create(
@@ -133,8 +135,10 @@ class ProductServiceTest {
         );
         ReflectionTestUtils.setField(product, "id", productId);
         given(productRepository.findById(productId)).willReturn(Optional.of(product));
+        product.isDelete();
 
         productService.delete(productId);
+        assertThat(product.getStatus()).isEqualTo(ProductStatus.DELETED);
         verify(productRepository).findById(productId);
     }
 }

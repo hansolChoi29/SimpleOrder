@@ -6,6 +6,7 @@ import com.sparta.simpleorder.domain.products.dto.response.CreateResponseDto;
 import com.sparta.simpleorder.domain.products.dto.response.GetListResponse;
 import com.sparta.simpleorder.domain.products.dto.response.GetOneResponse;
 import com.sparta.simpleorder.domain.products.dto.response.UpdateResponse;
+import com.sparta.simpleorder.domain.products.entity.ProductStatus;
 import com.sparta.simpleorder.domain.products.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -132,7 +133,8 @@ class ProductControllerTest {
         UpdateRequest request = new UpdateRequest(
                 "name",
                 new BigDecimal(1000),
-                1
+                1,
+                ProductStatus.IMPOSSIBLE
         );
         UpdateResponse response = new UpdateResponse(productId);
 

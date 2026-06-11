@@ -46,10 +46,16 @@ public class Product {
     public void update(
             String name,
             BigDecimal price,
-            int stockQuantity
+            int stockQuantity,
+            ProductStatus status
     ) {
         this.name = name;
         this.price = price;
         this.stockQuantity = stockQuantity;
+        this.status = status;
+    }
+
+    public void isDelete() {
+        this.status = ProductStatus.DELETED;
     }
 }

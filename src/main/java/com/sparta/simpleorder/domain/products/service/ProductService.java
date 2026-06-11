@@ -74,16 +74,18 @@ public class ProductService {
         product.update(
                 request.name(),
                 request.price(),
-                request.stockQuantity()
+                request.stockQuantity(),
+                request.status()
         );
 
         return new UpdateResponse(product.getId());
     }
 
     @Transactional
-    public void delete(Long id){
+    public void delete(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 상품입니다."));
-        productRepository.delete(product);
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+
+        product.isDelete();
     }
 }
