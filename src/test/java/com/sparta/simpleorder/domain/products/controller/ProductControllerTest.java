@@ -18,7 +18,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import tools.jackson.databind.ObjectMapper;
-
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -146,5 +145,16 @@ class ProductControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(productId));
         verify(service).update(any(UpdateRequest.class), anyLong());
+    }
+
+    @Test
+    @DisplayName("상품삭제_성공")
+    void isDelete() throws Exception {
+        Long productId = 1L;
+        mockMvc.perform(
+                delete("/products/{id}", productId))
+                .andExpect(status().isNoContent());
+
+        verify(service).delete(productId);
     }
 }

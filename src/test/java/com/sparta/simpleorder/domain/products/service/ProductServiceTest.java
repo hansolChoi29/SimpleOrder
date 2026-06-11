@@ -120,4 +120,21 @@ class ProductServiceTest {
         verify(productRepository).findById(anyLong());
         verify(productRepository).existsByName("rename");
     }
+
+    @Test
+    @DisplayName("상품삭제_성공")
+    void isDelete(){
+        Long productId = 1L;
+
+        Product product = Product.create(
+                "name",
+                new BigDecimal(1000),
+                1
+        );
+        ReflectionTestUtils.setField(product, "id", productId);
+        given(productRepository.findById(productId)).willReturn(Optional.of(product));
+
+        productService.delete(productId);
+        verify(productRepository).findById(productId);
+    }
 }

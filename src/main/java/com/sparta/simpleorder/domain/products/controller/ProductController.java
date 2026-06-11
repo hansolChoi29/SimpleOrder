@@ -52,4 +52,12 @@ public class ProductController {
         UpdateResponse response = productService.update(request, id);
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(
+            @PathVariable("id") Long id
+    ){
+        productService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }

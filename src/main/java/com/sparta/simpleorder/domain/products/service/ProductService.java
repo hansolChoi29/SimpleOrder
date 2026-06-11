@@ -79,4 +79,11 @@ public class ProductService {
 
         return new UpdateResponse(product.getId());
     }
+
+    @Transactional
+    public void delete(Long id){
+        Product product = productRepository.findById(id)
+                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 상품입니다."));
+        productRepository.delete(product);
+    }
 }
