@@ -1,6 +1,6 @@
 package com.sparta.simpleorder.domain.products.dto.response;
 
-public record UpdateResponse(
+public record UpdateResponseDto(
         Long id
 ) {
 }

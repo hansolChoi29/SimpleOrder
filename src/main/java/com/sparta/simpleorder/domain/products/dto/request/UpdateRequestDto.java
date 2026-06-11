@@ -4,7 +4,7 @@ import com.sparta.simpleorder.domain.products.entity.ProductStatus;
 
 import java.math.BigDecimal;
 
-public record UpdateRequest (
+public record UpdateRequestDto(
         String name,
         BigDecimal price,
         int stockQuantity,

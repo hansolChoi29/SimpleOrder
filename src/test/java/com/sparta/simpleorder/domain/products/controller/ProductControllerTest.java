@@ -1,11 +1,11 @@
 package com.sparta.simpleorder.domain.products.controller;
 
 import com.sparta.simpleorder.domain.products.dto.request.CreateRequestDto;
-import com.sparta.simpleorder.domain.products.dto.request.UpdateRequest;
+import com.sparta.simpleorder.domain.products.dto.request.UpdateRequestDto;
 import com.sparta.simpleorder.domain.products.dto.response.CreateResponseDto;
-import com.sparta.simpleorder.domain.products.dto.response.GetListResponse;
-import com.sparta.simpleorder.domain.products.dto.response.GetOneResponse;
-import com.sparta.simpleorder.domain.products.dto.response.UpdateResponse;
+import com.sparta.simpleorder.domain.products.dto.response.GetListResponseDto;
+import com.sparta.simpleorder.domain.products.dto.response.GetOneResponseDto;
+import com.sparta.simpleorder.domain.products.dto.response.UpdateResponseDto;
 import com.sparta.simpleorder.domain.products.entity.ProductStatus;
 import com.sparta.simpleorder.domain.products.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
@@ -81,7 +81,7 @@ class ProductControllerTest {
     void getOne() throws Exception {
         Long productId = 1L;
 
-        GetOneResponse response = new GetOneResponse(
+        GetOneResponseDto response = new GetOneResponseDto(
                 productId,
                 "name",
                 new BigDecimal(1000),
@@ -105,14 +105,14 @@ class ProductControllerTest {
     @DisplayName("상품전제조회_성공")
     void getList() throws Exception {
         Long productId = 1L;
-        GetListResponse items = new GetListResponse(
+        GetListResponseDto items = new GetListResponseDto(
                 productId,
                 "name",
                 new BigDecimal(1000),
                 1
         );
 
-        List<GetListResponse> response = List.of(items);
+        List<GetListResponseDto> response = List.of(items);
 
         given(service.getList()).willReturn(response);
         mockMvc.perform(
@@ -130,15 +130,15 @@ class ProductControllerTest {
     @DisplayName("상품수정_성공")
     void update() throws Exception {
         Long productId = 1L;
-        UpdateRequest request = new UpdateRequest(
+        UpdateRequestDto request = new UpdateRequestDto(
                 "name",
                 new BigDecimal(1000),
                 1,
                 ProductStatus.IMPOSSIBLE
         );
-        UpdateResponse response = new UpdateResponse(productId);
+        UpdateResponseDto response = new UpdateResponseDto(productId);
 
-        given(service.update(any(UpdateRequest.class), anyLong())).willReturn(response);
+        given(service.update(any(UpdateRequestDto.class), anyLong())).willReturn(response);
 
         mockMvc.perform(
                         patch("/products/{id}", productId)
@@ -146,7 +146,7 @@ class ProductControllerTest {
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(productId));
-        verify(service).update(any(UpdateRequest.class), anyLong());
+        verify(service).update(any(UpdateRequestDto.class), anyLong());
     }
 
     @Test
