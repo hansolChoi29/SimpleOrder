@@ -1,9 +1,11 @@
 package com.sparta.simpleorder.domain.products.controller;
 
 import com.sparta.simpleorder.domain.products.dto.request.CreateRequestDto;
+import com.sparta.simpleorder.domain.products.dto.request.UpdateRequest;
 import com.sparta.simpleorder.domain.products.dto.response.CreateResponseDto;
 import com.sparta.simpleorder.domain.products.dto.response.GetListResponse;
 import com.sparta.simpleorder.domain.products.dto.response.GetOneResponse;
+import com.sparta.simpleorder.domain.products.dto.response.UpdateResponse;
 import com.sparta.simpleorder.domain.products.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -39,6 +41,15 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<List<GetListResponse>> getList(){
         List<GetListResponse> response = productService.getList();
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<UpdateResponse> update(
+            @RequestBody UpdateRequest request,
+            @PathVariable("id") Long id
+    ){
+        UpdateResponse response = productService.update(request, id);
         return ResponseEntity.ok(response);
     }
 }

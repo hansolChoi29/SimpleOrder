@@ -1,9 +1,11 @@
 package com.sparta.simpleorder.domain.products.service;
 
 import com.sparta.simpleorder.domain.products.dto.request.CreateRequestDto;
+import com.sparta.simpleorder.domain.products.dto.request.UpdateRequest;
 import com.sparta.simpleorder.domain.products.dto.response.CreateResponseDto;
 import com.sparta.simpleorder.domain.products.dto.response.GetListResponse;
 import com.sparta.simpleorder.domain.products.dto.response.GetOneResponse;
+import com.sparta.simpleorder.domain.products.dto.response.UpdateResponse;
 import com.sparta.simpleorder.domain.products.entity.Product;
 import com.sparta.simpleorder.domain.products.repository.ProductRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +22,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -90,5 +93,31 @@ class ProductServiceTest {
         List<GetListResponse> response = productService.getList();
         verify(productRepository).findAll();
         assertThat(response.get(0).id()).isEqualTo(productId);
+    }
+
+    @Test
+    @DisplayName("상품수정_성공")
+    void update() {
+        Long productId = 1L;
+        Product product = Product.create(
+          "name",
+          new BigDecimal(1000),
+                1
+        );
+        ReflectionTestUtils.setField(product, "id", productId);
+        UpdateRequest request = new UpdateRequest(
+                "rename",
+                new BigDecimal(1000),
+                1
+        );
+
+        given(productRepository.findById(anyLong())).willReturn(Optional.of(product));
+        given(productRepository.existsByName("rename")).willReturn(false);
+
+        UpdateResponse response = productService.update(request, productId);
+        assertThat(response.id()).isEqualTo(productId);
+
+        verify(productRepository).findById(anyLong());
+        verify(productRepository).existsByName("rename");
     }
 }

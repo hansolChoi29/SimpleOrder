@@ -42,4 +42,14 @@ public class Product {
         product.status = ProductStatus.POSSIBLE;
         return product;
     }
+
+    public void update(
+            String name,
+            BigDecimal price,
+            int stockQuantity
+    ) {
+        this.name = name;
+        this.price = price;
+        this.stockQuantity = stockQuantity;
+    }
 }

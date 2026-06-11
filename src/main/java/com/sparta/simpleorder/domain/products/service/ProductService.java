@@ -2,9 +2,11 @@ package com.sparta.simpleorder.domain.products.service;
 
 
 import com.sparta.simpleorder.domain.products.dto.request.CreateRequestDto;
+import com.sparta.simpleorder.domain.products.dto.request.UpdateRequest;
 import com.sparta.simpleorder.domain.products.dto.response.CreateResponseDto;
 import com.sparta.simpleorder.domain.products.dto.response.GetListResponse;
 import com.sparta.simpleorder.domain.products.dto.response.GetOneResponse;
+import com.sparta.simpleorder.domain.products.dto.response.UpdateResponse;
 import com.sparta.simpleorder.domain.products.entity.Product;
 import com.sparta.simpleorder.domain.products.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +50,7 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public List<GetListResponse> getList(){
+    public List<GetListResponse> getList() {
         return productRepository.findAll().stream().map(
                 product -> new GetListResponse(
                         product.getId(),
@@ -57,5 +59,24 @@ public class ProductService {
                         product.getStockQuantity()
                 )
         ).toList();
+    }
+
+    @Transactional
+    public UpdateResponse update(
+            UpdateRequest request,
+            Long id
+    ) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+        if (productRepository.existsByName(request.name())) {
+            throw new IllegalArgumentException("이미 존재하는 상품입니다.");
+        }
+        product.update(
+                request.name(),
+                request.price(),
+                request.stockQuantity()
+        );
+
+        return new UpdateResponse(product.getId());
     }
 }
