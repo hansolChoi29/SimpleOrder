@@ -2,6 +2,7 @@ package com.sparta.simpleorder.domain.orders.controller;
 
 import com.sparta.simpleorder.domain.orders.dto.request.CreateRequestDto;
 import com.sparta.simpleorder.domain.orders.dto.response.CreateResponseDto;
+import com.sparta.simpleorder.domain.orders.dto.response.GetListResponseDto;
 import com.sparta.simpleorder.domain.orders.dto.response.GetOneResponseDto;
 import com.sparta.simpleorder.domain.orders.entity.Order;
 import com.sparta.simpleorder.domain.orders.entity.OrderStatus;
@@ -22,6 +23,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -106,5 +108,37 @@ class OrderControllerTest {
         assertThat(response.status()).isEqualTo(OrderStatus.ORDERED);
 
         verify(orderService).getOne(orderId);
+    }
+
+    @Test
+    @DisplayName("주문전체조회_성공")
+    void getList() throws Exception {
+        Long orderId = 1L;
+        Long productId = 1L;
+
+        GetListResponseDto items = new GetListResponseDto(
+                orderId,
+                productId,
+                "name",
+                1,
+                new BigDecimal(1000),
+                OrderStatus.ORDERED,
+                LocalDateTime.now()
+        );
+        List<GetListResponseDto> response = List.of(items);
+
+        given(orderService.getList()).willReturn(response);
+        mockMvc.perform(
+                        get("/orders")
+                                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(orderId))
+                .andExpect(jsonPath("$[0].productId").value(productId))
+                .andExpect(jsonPath("$[0].productName").value("name"))
+                .andExpect(jsonPath("$[0].quantity").value(1))
+                .andExpect(jsonPath("$[0].totalPrice").value(new BigDecimal(1000)))
+                .andExpect(jsonPath("$[0].status").value("ORDERED"));
+
+        verify(orderService).getList();
     }
 }

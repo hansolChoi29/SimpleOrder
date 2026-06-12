@@ -2,6 +2,7 @@ package com.sparta.simpleorder.domain.orders.service;
 
 
 import com.sparta.simpleorder.domain.orders.dto.request.CreateRequestDto;
+import com.sparta.simpleorder.domain.orders.dto.response.GetListResponseDto;
 import com.sparta.simpleorder.domain.orders.dto.response.GetOneResponseDto;
 import com.sparta.simpleorder.domain.orders.entity.Order;
 import com.sparta.simpleorder.domain.orders.repository.OrderRepository;
@@ -12,6 +13,8 @@ import com.sparta.simpleorder.domain.products.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -49,5 +52,23 @@ public class OrderService {
                 order.getStatus(),
                 order.getCreatedAt()
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<GetListResponseDto> getList(){
+        return orderRepository.findAll()
+                .stream()
+                .map(
+                        order -> new GetListResponseDto(
+                                order.getId(),
+                                order.getProduct().getId(),
+                                order.getProduct().getName(),
+                                order.getQuantity(),
+                                order.getTotalPrice(),
+                                order.getStatus(),
+                                order.getCreatedAt()
+                        )
+                )
+                .toList();
     }
 }

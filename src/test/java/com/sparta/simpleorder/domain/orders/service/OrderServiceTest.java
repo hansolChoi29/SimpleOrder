@@ -2,6 +2,7 @@ package com.sparta.simpleorder.domain.orders.service;
 
 import com.sparta.simpleorder.domain.orders.dto.request.CreateRequestDto;
 import com.sparta.simpleorder.domain.orders.dto.response.CreateResponseDto;
+import com.sparta.simpleorder.domain.orders.dto.response.GetListResponseDto;
 import com.sparta.simpleorder.domain.orders.dto.response.GetOneResponseDto;
 import com.sparta.simpleorder.domain.orders.entity.Order;
 import com.sparta.simpleorder.domain.orders.entity.OrderStatus;
@@ -17,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -89,6 +91,28 @@ class OrderServiceTest {
         assertThat(response.quantity()).isEqualTo(order.getQuantity());
         assertThat(response.totalPrice()).isEqualTo(order.getTotalPrice());
         assertThat(response.status()).isEqualTo(OrderStatus.ORDERED);
+    }
+
+    @Test
+    @DisplayName("주문전체조회_성공")
+    void getList() {
+        Long orderId = 1L;
+        Product product = Product.create(
+                "name",
+                new BigDecimal(1000),
+                1
+        );
+        Order order = Order.create(
+                product,
+                1
+        );
+        ReflectionTestUtils.setField(order, "id", orderId);
+
+        given(orderRepository.findAll()).willReturn(List.of(order));
+
+        List<GetListResponseDto> response = orderService.getList();
+        verify(orderRepository).findAll();
+        assertThat(response.get(0).id()).isEqualTo(orderId);
     }
 
 }
