@@ -26,12 +26,14 @@ public class OrderService {
 
     @Transactional
     public CreateResponseDto create(CreateRequestDto request) {
-        Product product = productRepository.findById(request.productId())
+        Product product = productRepository.findByIdWithLock(request.productId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
 
         if (product.getStatus() != ProductStatus.POSSIBLE) {
             throw new IllegalArgumentException("주문 불가능한 상품입니다.");
         }
+        product.decreaseStock(request.quantity());
+
         Order order = Order.create(
                 product,
                 request.quantity()
