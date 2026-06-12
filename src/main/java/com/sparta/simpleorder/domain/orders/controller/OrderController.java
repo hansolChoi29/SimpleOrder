@@ -5,7 +5,9 @@ import com.sparta.simpleorder.domain.orders.dto.request.CreateRequestDto;
 import com.sparta.simpleorder.domain.orders.dto.response.CreateResponseDto;
 import com.sparta.simpleorder.domain.orders.dto.response.GetListResponseDto;
 import com.sparta.simpleorder.domain.orders.dto.response.GetOneResponseDto;
+import com.sparta.simpleorder.domain.orders.dto.response.UpdateResponseDto;
 import com.sparta.simpleorder.domain.orders.service.OrderService;
+import com.sparta.simpleorder.domain.orders.dto.request.UpdateRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +44,15 @@ public class OrderController {
 
     ) {
         List<GetListResponseDto> response = orderService.getList();
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<UpdateResponseDto> update(
+            @RequestBody UpdateRequestDto request,
+            @PathVariable("id") Long id
+    ){
+        UpdateResponseDto response = orderService.update(request, id);
         return ResponseEntity.ok(response);
     }
 }

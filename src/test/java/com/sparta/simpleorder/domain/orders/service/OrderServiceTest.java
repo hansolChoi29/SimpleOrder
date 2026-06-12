@@ -1,9 +1,11 @@
 package com.sparta.simpleorder.domain.orders.service;
 
 import com.sparta.simpleorder.domain.orders.dto.request.CreateRequestDto;
+import com.sparta.simpleorder.domain.orders.dto.request.UpdateRequestDto;
 import com.sparta.simpleorder.domain.orders.dto.response.CreateResponseDto;
 import com.sparta.simpleorder.domain.orders.dto.response.GetListResponseDto;
 import com.sparta.simpleorder.domain.orders.dto.response.GetOneResponseDto;
+import com.sparta.simpleorder.domain.orders.dto.response.UpdateResponseDto;
 import com.sparta.simpleorder.domain.orders.entity.Order;
 import com.sparta.simpleorder.domain.orders.entity.OrderStatus;
 import com.sparta.simpleorder.domain.orders.repository.OrderRepository;
@@ -115,4 +117,28 @@ class OrderServiceTest {
         assertThat(response.get(0).id()).isEqualTo(orderId);
     }
 
+    @Test
+    @DisplayName("주문수정_성공")
+    void update() {
+        Long orderId = 1L;
+        UpdateRequestDto request = new UpdateRequestDto(
+                1,
+                OrderStatus.ORDERED
+        );
+        Product product = Product.create(
+                "name",
+                new BigDecimal(1000),
+                1
+        );
+        Order order = Order.create(
+                product,
+                1
+        );
+        ReflectionTestUtils.setField(order, "id", 1L);
+        given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
+        UpdateResponseDto response = orderService.update(request, orderId);
+        assertThat(response.id()).isEqualTo(orderId);
+
+        verify(orderRepository).findById(orderId);
+    }
 }

@@ -39,12 +39,20 @@ public class Order {
     public static Order create(
             Product product,
             int quantity
-    ){
+    ) {
         Order order = new Order();
         order.product = product;
         order.quantity = quantity;
         order.totalPrice = product.getPrice().multiply(BigDecimal.valueOf(quantity));
         order.status = OrderStatus.ORDERED;
         return order;
+    }
+
+    public void update(
+            int quantity,
+            OrderStatus status
+    ) {
+        this.quantity = quantity;
+        this.status = status;
     }
 }

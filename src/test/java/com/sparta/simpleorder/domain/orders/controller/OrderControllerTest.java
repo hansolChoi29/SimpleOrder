@@ -1,9 +1,11 @@
 package com.sparta.simpleorder.domain.orders.controller;
 
 import com.sparta.simpleorder.domain.orders.dto.request.CreateRequestDto;
+import com.sparta.simpleorder.domain.orders.dto.request.UpdateRequestDto;
 import com.sparta.simpleorder.domain.orders.dto.response.CreateResponseDto;
 import com.sparta.simpleorder.domain.orders.dto.response.GetListResponseDto;
 import com.sparta.simpleorder.domain.orders.dto.response.GetOneResponseDto;
+import com.sparta.simpleorder.domain.orders.dto.response.UpdateResponseDto;
 import com.sparta.simpleorder.domain.orders.entity.Order;
 import com.sparta.simpleorder.domain.orders.entity.OrderStatus;
 import com.sparta.simpleorder.domain.orders.service.OrderService;
@@ -30,11 +32,11 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -140,5 +142,24 @@ class OrderControllerTest {
                 .andExpect(jsonPath("$[0].status").value("ORDERED"));
 
         verify(orderService).getList();
+    }
+
+    @Test
+    @DisplayName("주문수정_성공")
+    void update() throws Exception {
+        Long orderId = 1L;
+
+        UpdateRequestDto request = new UpdateRequestDto(1, OrderStatus.ORDERED);
+        UpdateResponseDto response = new UpdateResponseDto(
+                orderId
+        );
+        given(orderService.update(any(UpdateRequestDto.class), anyLong())).willReturn(response);
+        mockMvc.perform(
+                        patch("/orders/{id}", orderId)
+                                .contentType(APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(orderId));
+        verify(orderService).update(any(UpdateRequestDto.class), anyLong());
     }
 }
