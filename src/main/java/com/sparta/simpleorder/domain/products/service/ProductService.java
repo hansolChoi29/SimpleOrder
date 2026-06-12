@@ -65,8 +65,10 @@ public class ProductService {
             Long id
     ) {
         Product product = notFoundProduct(id);
-        validateDuplicateProductName(request.name());
-        // TODO : 자기 자신은 허용되게
+
+        if(productRepository.existsByNameAndIdNot(request.name(), id)){
+            throw new IllegalArgumentException("이미 존재하는 상품입니다.");
+        }
         product.update(
                 request.name(),
                 request.price(),

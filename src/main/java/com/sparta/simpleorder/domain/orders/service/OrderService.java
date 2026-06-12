@@ -32,7 +32,6 @@ public class OrderService {
         if (product.getStatus() != ProductStatus.POSSIBLE) {
             throw new IllegalArgumentException("주문 불가능한 상품입니다.");
         }
-
         Order order = Order.create(
                 product,
                 request.quantity()
@@ -43,8 +42,7 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     public GetOneResponseDto getOne(Long id) {
-        Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문내역입니다."));
+        Order order = orderNotFound(id);
         return new GetOneResponseDto(
                 order.getId(),
                 order.getProduct().getId(),
@@ -79,20 +77,22 @@ public class OrderService {
             UpdateRequestDto request,
             Long id
     ){
-        Order order = orderRepository.findById(id)
-                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 주문내역입니다."));
+        Order order = orderNotFound(id);
         order.update(
                 request.quantity(),
                 request.status()
         );
-
         return new UpdateResponseDto(order.getId());
     }
 
     @Transactional
     public void delete(Long id){
-        Order order = orderRepository.findById(id)
-                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 주문내역입니다."));
+        Order order = orderNotFound(id);
         order.isDelete();
+    }
+
+    private Order orderNotFound(Long id){
+        return orderRepository.findById(id)
+                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 주문내역입니다."));
     }
 }
