@@ -55,4 +55,12 @@ public class OrderController {
         UpdateResponseDto response = orderService.update(request, id);
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(
+        @PathVariable("id") Long id
+    ){
+        orderService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }

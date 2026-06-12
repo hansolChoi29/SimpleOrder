@@ -55,4 +55,8 @@ public class Order {
         this.quantity = quantity;
         this.status = status;
     }
+
+    public void isDelete() {
+        this.status = OrderStatus.CANCELLED;
+    }
 }

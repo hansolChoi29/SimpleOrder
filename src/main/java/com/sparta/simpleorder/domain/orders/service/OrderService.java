@@ -80,12 +80,19 @@ public class OrderService {
             Long id
     ){
         Order order = orderRepository.findById(id)
-                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 상품입니다."));
+                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 주문내역입니다."));
         order.update(
                 request.quantity(),
                 request.status()
         );
 
         return new UpdateResponseDto(order.getId());
+    }
+
+    @Transactional
+    public void delete(Long id){
+        Order order = orderRepository.findById(id)
+                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 주문내역입니다."));
+        order.isDelete();
     }
 }

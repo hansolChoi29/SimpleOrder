@@ -162,4 +162,15 @@ class OrderControllerTest {
                 .andExpect(jsonPath("$.id").value(orderId));
         verify(orderService).update(any(UpdateRequestDto.class), anyLong());
     }
+
+    @Test
+    @DisplayName("주문취소")
+    void isDelete() throws Exception {
+        Long orderId = 1L;
+        mockMvc.perform(
+                delete("/orders/{id}", orderId)
+                        .contentType(APPLICATION_JSON))
+                        .andExpect(status().isNoContent());
+        verify(orderService).delete(orderId);
+    }
 }

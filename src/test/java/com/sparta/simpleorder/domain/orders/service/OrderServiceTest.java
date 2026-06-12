@@ -141,4 +141,25 @@ class OrderServiceTest {
 
         verify(orderRepository).findById(orderId);
     }
+
+    @Test
+    @DisplayName("주문취소_성공")
+    void isDelete() {
+        Long orderId = 1L;
+        Product product = Product.create(
+                "name",
+                new BigDecimal(1000),
+                1
+        );
+        Order order = Order.create(
+                product,
+                1
+        );
+
+        given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
+        orderService.delete(orderId);
+
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.CANCELLED);
+        verify(orderRepository).findById(orderId);
+    }
 }
