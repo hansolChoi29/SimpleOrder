@@ -208,7 +208,6 @@ class ProductServiceTest {
                 new BigDecimal(1000),
                 1
         );
-        ReflectionTestUtils.setField(product, "id", productId);
 
         given(productRepository.findById(productId)).willReturn(Optional.of(product));
 
