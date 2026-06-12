@@ -9,11 +9,13 @@ import com.sparta.simpleorder.domain.orders.dto.response.UpdateResponseDto;
 import com.sparta.simpleorder.domain.orders.service.OrderService;
 import com.sparta.simpleorder.domain.orders.dto.request.UpdateRequestDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/orders")
@@ -40,10 +42,12 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity<List<GetListResponseDto>> getList(
-
+    public ResponseEntity<Page<GetListResponseDto>> getList(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size
     ) {
-        List<GetListResponseDto> response = orderService.getList();
+        Pageable pageable = PageRequest.of(page, size);
+        Page<GetListResponseDto> response = orderService.getList(pageable);
         return ResponseEntity.ok(response);
     }
 
