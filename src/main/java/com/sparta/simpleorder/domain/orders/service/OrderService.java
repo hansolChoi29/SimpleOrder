@@ -13,6 +13,8 @@ import com.sparta.simpleorder.domain.products.entity.Product;
 import com.sparta.simpleorder.domain.products.entity.ProductStatus;
 import com.sparta.simpleorder.domain.products.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,9 +59,8 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public List<GetListResponseDto> getList(){
-        return orderRepository.findAll()
-                .stream()
+    public Page<GetListResponseDto> getList(Pageable pageable){
+        return orderRepository.findAllWithProduct(pageable)
                 .map(
                         order -> new GetListResponseDto(
                                 order.getId(),
@@ -69,9 +70,7 @@ public class OrderService {
                                 order.getTotalPrice(),
                                 order.getStatus(),
                                 order.getCreatedAt()
-                        )
-                )
-                .toList();
+                        ));
     }
 
     @Transactional

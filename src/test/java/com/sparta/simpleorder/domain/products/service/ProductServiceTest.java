@@ -147,13 +147,13 @@ class ProductServiceTest {
         );
 
         given(productRepository.findById(anyLong())).willReturn(Optional.of(product));
-        given(productRepository.existsByName("rename")).willReturn(false);
+        given(productRepository.existsByNameAndIdNot("rename", productId)).willReturn(false);
 
         UpdateResponseDto response = productService.update(request, productId);
         assertThat(response.id()).isEqualTo(productId);
 
         verify(productRepository).findById(anyLong());
-        verify(productRepository).existsByName("rename");
+        verify(productRepository).existsByNameAndIdNot("rename", productId);
     }
 
     @Test
@@ -188,14 +188,14 @@ class ProductServiceTest {
                 ProductStatus.IMPOSSIBLE
         );
         given(productRepository.findById(productId)).willReturn(Optional.of(product));
-        given(productRepository.existsByName("rename")).willReturn(true);
+        given(productRepository.existsByNameAndIdNot("rename", productId)).willReturn(true);
 
         assertThatThrownBy(() -> productService.update(request, productId))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("이미 존재하는 상품입니다.");
 
         verify(productRepository).findById(productId);
-        verify(productRepository).existsByName("rename");
+        verify(productRepository).existsByNameAndIdNot("rename", productId);
     }
 
     @Test
