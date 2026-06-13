@@ -6,10 +6,8 @@ import com.sparta.simpleorder.domain.orders.dto.response.CreateResponseDto;
 import com.sparta.simpleorder.domain.orders.dto.response.GetListResponseDto;
 import com.sparta.simpleorder.domain.orders.dto.response.GetOneResponseDto;
 import com.sparta.simpleorder.domain.orders.dto.response.UpdateResponseDto;
-import com.sparta.simpleorder.domain.orders.entity.Order;
 import com.sparta.simpleorder.domain.orders.entity.OrderStatus;
 import com.sparta.simpleorder.domain.orders.service.OrderService;
-import com.sparta.simpleorder.domain.products.entity.Product;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +16,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import tools.jackson.databind.ObjectMapper;
@@ -26,11 +28,9 @@ import tools.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -115,6 +115,8 @@ class OrderControllerTest {
     @Test
     @DisplayName("주문전체조회_성공")
     void getList() throws Exception {
+        int page = 0;
+        int size = 10;
         Long orderId = 1L;
         Long productId = 1L;
 
@@ -127,21 +129,23 @@ class OrderControllerTest {
                 OrderStatus.ORDERED,
                 LocalDateTime.now()
         );
-        List<GetListResponseDto> response = List.of(items);
+        Pageable pageable = PageRequest.of(page, size);
 
-        given(orderService.getList()).willReturn(response);
+        Page<GetListResponseDto> response = new PageImpl<>(List.of(items), pageable, 1);
+        given(orderService.getList(any(Pageable.class))).willReturn(response);
+
         mockMvc.perform(
                         get("/orders")
                                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(orderId))
-                .andExpect(jsonPath("$[0].productId").value(productId))
-                .andExpect(jsonPath("$[0].productName").value("name"))
-                .andExpect(jsonPath("$[0].quantity").value(1))
-                .andExpect(jsonPath("$[0].totalPrice").value(new BigDecimal(1000)))
-                .andExpect(jsonPath("$[0].status").value("ORDERED"));
+                .andExpect(jsonPath("$.content[0].id").value(orderId))
+                .andExpect(jsonPath("$.content[0].productId").value(productId))
+                .andExpect(jsonPath("$.content[0].productName").value("name"))
+                .andExpect(jsonPath("$.content[0].quantity").value(1))
+                .andExpect(jsonPath("$.content[0].totalPrice").value(new BigDecimal(1000)))
+                .andExpect(jsonPath("$.content[0].status").value("ORDERED"));
 
-        verify(orderService).getList();
+        verify(orderService).getList(any(Pageable.class));
     }
 
     @Test
