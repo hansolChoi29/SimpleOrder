@@ -63,11 +63,11 @@ class OrderServiceTest {
                 1
         );
         ReflectionTestUtils.setField(order, "id", 1L);
-        given(productRepository.findById(productId)).willReturn(Optional.of(product));
+        given(productRepository.findByIdWithLock(productId)).willReturn(Optional.of(product));
         given(orderRepository.save(any(Order.class))).willReturn(order);
 
         CreateResponseDto response = orderService.create(request);
-        verify(productRepository).findById(productId);
+        verify(productRepository).findByIdWithLock(productId);
         verify(orderRepository).save(any(Order.class));
 
         assertThat(response.id()).isEqualTo(order.getId());
@@ -93,10 +93,30 @@ class OrderServiceTest {
                 ProductStatus.DELETED
         );
 
-        given(productRepository.findById(productId)).willReturn(Optional.of(product));
+        given(productRepository.findByIdWithLock(productId)).willReturn(Optional.of(product));
         assertThatThrownBy(() -> orderService.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("주문 불가능한 상품입니다.");
+    }
+
+    @Test
+    @DisplayName("주문생성_재고부족")
+    void decreaseStockQuantity() {
+        Long productId = 1L;
+        CreateRequestDto request = new CreateRequestDto(
+                productId,
+                1
+        );
+        Product product = Product.create(
+                "name",
+                new BigDecimal(1000),
+                0
+        );
+        given(productRepository.findByIdWithLock(productId)).willReturn(Optional.of(product));
+
+        assertThatThrownBy(() -> orderService.create(request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("재고가 부족합니다.");
     }
 
     @Test
