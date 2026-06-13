@@ -6,10 +6,8 @@ import com.sparta.simpleorder.domain.orders.dto.response.CreateResponseDto;
 import com.sparta.simpleorder.domain.orders.dto.response.GetListResponseDto;
 import com.sparta.simpleorder.domain.orders.dto.response.GetOneResponseDto;
 import com.sparta.simpleorder.domain.orders.dto.response.UpdateResponseDto;
-import com.sparta.simpleorder.domain.orders.entity.Order;
 import com.sparta.simpleorder.domain.orders.entity.OrderStatus;
 import com.sparta.simpleorder.domain.orders.service.OrderService;
-import com.sparta.simpleorder.domain.products.entity.Product;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,11 +28,9 @@ import tools.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
