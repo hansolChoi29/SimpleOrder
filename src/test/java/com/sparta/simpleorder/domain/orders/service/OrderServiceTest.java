@@ -10,6 +10,7 @@ import com.sparta.simpleorder.domain.orders.entity.Order;
 import com.sparta.simpleorder.domain.orders.entity.OrderStatus;
 import com.sparta.simpleorder.domain.orders.repository.OrderRepository;
 import com.sparta.simpleorder.domain.products.entity.Product;
+import com.sparta.simpleorder.domain.products.entity.ProductStatus;
 import com.sparta.simpleorder.domain.products.repository.ProductRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
@@ -24,6 +29,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -69,6 +75,32 @@ class OrderServiceTest {
     }
 
     @Test
+    @DisplayName("주문불가능")
+    void create_productStatus_isImpossible() {
+        Long productId = 1L;
+        CreateRequestDto request = new CreateRequestDto(
+                productId,
+                1
+        );
+        Product product = Product.create(
+                "name",
+                new BigDecimal(1000),
+                1
+        );
+        product.update(
+                "name",
+                BigDecimal.valueOf(1000),
+                1,
+                ProductStatus.DELETED
+        );
+
+        given(productRepository.findById(productId)).willReturn(Optional.of(product));
+        assertThatThrownBy(() -> orderService.create(request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("주문 불가능한 상품입니다.");
+    }
+
+    @Test
     @DisplayName("주문단건조회_성공")
     void getOne() {
         Long orderId = 1L;
@@ -110,11 +142,14 @@ class OrderServiceTest {
         );
         ReflectionTestUtils.setField(order, "id", orderId);
 
-        given(orderRepository.findAll()).willReturn(List.of(order));
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Order> orderPage = new PageImpl<>(List.of(order), pageable, 1);
 
-        List<GetListResponseDto> response = orderService.getList();
-        verify(orderRepository).findAll();
-        assertThat(response.get(0).id()).isEqualTo(orderId);
+        given(orderRepository.findAllWithProduct(any(Pageable.class))).willReturn(orderPage);
+
+        Page<GetListResponseDto> response = orderService.getList(pageable);
+        verify(orderRepository).findAllWithProduct(any(Pageable.class));
+        assertThat(response.getContent().get(0).id()).isEqualTo(orderId);
     }
 
     @Test
