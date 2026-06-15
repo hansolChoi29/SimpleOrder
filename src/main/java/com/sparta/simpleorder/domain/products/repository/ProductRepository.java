@@ -12,8 +12,6 @@ import java.util.Optional;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     boolean existsByName(String name);
 
-    boolean existsByNameAndIdNot(String name, Long id);
-
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
                     SELECT p FROM Product p WHERE p.id = :id

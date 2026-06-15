@@ -66,8 +66,10 @@ public class ProductService {
     ) {
         Product product = notFoundProduct(id);
 
-        if(productRepository.existsByNameAndIdNot(request.name(), id)){
-            throw new IllegalArgumentException("이미 존재하는 상품입니다.");
+        if (!product.getName().equals(request.name())) {
+            if (productRepository.existsByName(request.name())) {
+                throw new IllegalArgumentException("이미 존재하는 상품입니다.");
+            }
         }
         product.update(
                 request.name(),

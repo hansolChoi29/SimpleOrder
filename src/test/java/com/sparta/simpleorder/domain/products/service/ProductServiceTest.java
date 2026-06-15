@@ -147,29 +147,39 @@ class ProductServiceTest {
         );
 
         given(productRepository.findById(anyLong())).willReturn(Optional.of(product));
-        given(productRepository.existsByNameAndIdNot("rename", productId)).willReturn(false);
+        given(productRepository.existsByName("rename")).willReturn(false);
 
         UpdateResponseDto response = productService.update(request, productId);
         assertThat(response.id()).isEqualTo(productId);
 
         verify(productRepository).findById(anyLong());
-        verify(productRepository).existsByNameAndIdNot("rename", productId);
+        verify(productRepository).existsByName("rename");
     }
 
     @Test
     @DisplayName("상품수정_존재하지않는_상품")
-    void update_notFound() {
+    void update_sameName_skipDuplicateCheck() {
         Long productId = 1L;
-        UpdateRequestDto request = new UpdateRequestDto(
+        Product product = Product.create(
                 "name",
                 new BigDecimal(1000),
-                1,
-                ProductStatus.IMPOSSIBLE
+                1
         );
-        assertThatThrownBy(() -> productService.update(request, productId))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("존재하지 않는 상품입니다.");
+        ReflectionTestUtils.setField(product, "id", productId);
+
+        UpdateRequestDto request = new UpdateRequestDto(
+                "name",
+                new BigDecimal(2000),
+                5,
+                ProductStatus.POSSIBLE
+        );
+
+        given(productRepository.findById(productId)).willReturn(Optional.of(product));
+
+        productService.update(request, productId);
+
         verify(productRepository).findById(productId);
+        verify(productRepository, never()).existsByName(any());
     }
 
     @Test
@@ -188,14 +198,14 @@ class ProductServiceTest {
                 ProductStatus.IMPOSSIBLE
         );
         given(productRepository.findById(productId)).willReturn(Optional.of(product));
-        given(productRepository.existsByNameAndIdNot("rename", productId)).willReturn(true);
+        given(productRepository.existsByName("rename")).willReturn(true);
 
         assertThatThrownBy(() -> productService.update(request, productId))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("이미 존재하는 상품입니다.");
 
         verify(productRepository).findById(productId);
-        verify(productRepository).existsByNameAndIdNot("rename", productId);
+        verify(productRepository).existsByName("rename");
     }
 
     @Test
