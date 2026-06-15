@@ -8,9 +8,13 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    @Query("""
-                    SELECT o FROM Order o
-                    JOIN FETCH o.product
-            """)
+    @Query(
+            value = """
+        SELECT o FROM Order o
+        JOIN FETCH o.product
+        """,
+        countQuery = """
+                    SELECT COUNT(o) FROM Order o
+                    """)
     Page<Order> findAllWithProduct(Pageable pageable);
 }
